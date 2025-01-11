@@ -3,58 +3,74 @@
 #include "printmap.h"
 #include "generateArray.h"
 #include "updategame.h"
+#include "raylib.h"
 
 extern kingdom c;
-extern village Vill[10];
-extern int map[17][17];
-extern roadBuild road;
-extern int x, y;
+extern Tile map[17][17];
 
 void clrscr(){
     system("clear");
 }
 
-void printMap() {
-    //function for print game map
-    int i, j;
-    for(i=0; i<x; i++) {
-        for(j=0; j<y; j++) {
-            if(i == road.x && j == road.y) printf("🟢");
-            else if(map[i][j]==7) printf("🏰");
-            else if(map[i][j]==-2) printf("❌");
-            else if(map[i][j]==8) printf("🌳");
-            else if(map[i][j]==0) printf("🛣 ");
-            else if(map[i][j]==1) printf("1️⃣ ");
-            else if(map[i][j]==2) printf("2️⃣ ");
-            else if(map[i][j]==3) printf("3️⃣ ");
-            else if(map[i][j]==4) printf("4️⃣ ");
+void DrawMap(int x, int y, int player) {
+    Texture2D imageV = LoadTexture("//media/mahdi/Other/village.png");
+    Texture2D imageB = LoadTexture("/media/mahdi/Other/block.png");
+    for (int i = 0; i < x; i++) {
+        for (int j = 0; j < y; j++) {
+            int positionX = i * TILE_SIZE + 100;
+            int positionY = j * TILE_SIZE + 100;
+            Color color = LIGHTGRAY;
+
+            switch (map[i][j].type) {      
+                case VILLAGE: {
+                    switch(map[i][j].forkingdom){
+                           case -1: color = GREEN; break;
+                            case 0: color = BLUE; break;
+                            case 1: color = RED; break;
+                            case 2: color = ORANGE; break;
+                            case 3: color = YELLOW; break;
+                        }
+                    DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color);
+                    char valueText[10];
+                    snprintf(valueText, 10, "V"); 
+                    DrawText(valueText, 
+                        positionX + TILE_SIZE / 2 - MeasureText(valueText, 20) / 2, 
+                        positionY + TILE_SIZE / 2 - 10, 20, BLACK); break;
+                }
+                case KINGDOM:{
+                switch(map[i][j].forkingdom){
+                        case 0: color = BLUE; break;
+                        case 1: color = RED; break;
+                        case 2: color = ORANGE; break;
+                        case 3: color = YELLOW; break;
+                    }
+                    DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color);
+                    char valueText[10];
+                    snprintf(valueText, 10, "K"); 
+                    DrawText(valueText, 
+                        positionX + TILE_SIZE / 2 - MeasureText(valueText, 20) / 2, 
+                        positionY + TILE_SIZE / 2 - 10, 20, BLACK); break;
+                }
+                case BLOCK_HOUSE: DrawTexture(imageB, positionX, positionY, RED);  break;
+                case TERRAIN:color = BROWN; DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color);  break;
+                case ROAD:
+                    switch(map[i][j].forkingdom){
+                        case 0: color = BLUE; break;
+                        case 1: color = RED; break;
+                        case 2: color = ORANGE; break;
+                        case 3: color = YELLOW; break;
+                    }
+                    DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color); break;
+            }
+            DrawRectangleLines(positionX, positionY, TILE_SIZE, TILE_SIZE, BLACK);
+
+            if(map[i][j].type == TERRAIN){
+            char valueText[10]; 
+            snprintf(valueText, 10, "%d", map[i][j].difficulty[player]); 
+            DrawText(valueText, 
+                     positionX + TILE_SIZE / 2 - MeasureText(valueText, 20) / 2, 
+                     positionY + TILE_SIZE / 2 - 10, 20, BLACK);
+            }
         }
-        printf("\n");
     }
-    printf("------------------------------\n");
-}
-
-
-void printMove(){
-    printf("If you want to buy food for 1 gold, enter 1.\nIf you want to buy the worker for 3 food, enter 2.\n");
-    printf("If you want to buy the soldier for 2 gold, enter 3.\nif you want to build a road, enter 4.\nif you want to do nothing press 5.\nselect your action:\n");
-}
-
-void printAsset(int v){
-    int cmakeGold=c.makeGold, cmakeFood=c.makeFood;
-    int i;
-    for(i=0;i<v;i++){
-		if(conectionvillage(Vill[i])){
-			cmakeGold+=Vill[i].makeGold;
-			cmakeFood+=Vill[i].makeFood;
-		}
-    }
-    printf("\nGold production rate:%d\n", cmakeGold);
-    printf("food production rate:%d\n", cmakeFood);
-    printf("food:%d\n", c.food);
-    printf("gold:%d\n", c.gold);
-    printf("soldier:%d\n", c.soldier);
-    printf("worker:%d\n", c.worker);
-    printf("------------------------------\n");
-
 }

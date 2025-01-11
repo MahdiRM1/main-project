@@ -3,8 +3,6 @@
 #define PRINTMAP_H
 
 void clrscr();
-void printMap();
-void printAsset(int v);
-void printMove();
+void DrawMap(int x, int y, int player);
 
 #endif //PRINTMAP_H

@@ -4,19 +4,9 @@
 #include <termios.h>
 #include <unistd.h>
 #include "generateArray.h"
+#include "raylib.h"
 
-extern kingdom c;
-extern village Vill[10];
-extern int map[17][17];
-extern roadBuild road;
-
-
-void enableRawMode() {
-    struct termios raw;
-    tcgetattr(STDIN_FILENO, &raw);
-    raw.c_lflag &= ~(ICANON | ECHO); // غیر فعال کردن canonical mode و echo
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-}
+extern Tile map[17][17];
 
 int generate_number() {//randomize road difficulty
     const double probs [9] = {0.65, 0.25, 0.05, 0.05, 0, 0, 0, 0, 0};
@@ -37,6 +27,16 @@ void generate_array(int x, int y) {
     int i, j;
     for (i = 0; i < 17; i++) 
         for (j = 0; j < 17; j++) 
-            if(i<x && j<y) map[i][j] = generate_number();
-            else map[i][j] = INF;
+            if(i<x && j<y) {
+                map[i][j].firstDiff = generate_number();
+                map[i][j].difficulty[0] = map[i][j].firstDiff;
+                map[i][j].difficulty[1] = map[i][j].firstDiff;
+                map[i][j].difficulty[2] = map[i][j].firstDiff;
+                map[i][j].difficulty[3] = map[i][j].firstDiff;
+                map[i][j].type = TERRAIN;
+            }
+            else {
+                map[i][j].type = EMPTY;
+                map[i][j].firstDiff = INF;
+            }
 }

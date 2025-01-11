@@ -4,8 +4,7 @@
 #include "generateArray.h"
 
 int canBuild();
-int conectionvillage(village vill);
-int update();
-
+int update(int x, int y, int player);
+int conectionvillage(int villx, int villy);
 
 #endif

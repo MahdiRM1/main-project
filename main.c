@@ -4,74 +4,91 @@
 #include "printmap.h"
 #include "generateArray.h"
 #include "updategame.h"
+#include "raylib.h"  
 
-kingdom c;
-village Vill[10];
-int map[17][17]; //main array
-int x, y;
-roadBuild road = {-1, -1};
+kingdom c[4];
+Tile map[17][17]; //main array
 int v;
+village Vill[10];
+int kingnum;
 
 const int maxv=10;
 
 int main() {
-	clrscr();
-		int n, i;
-		printf("enter x and y for map:"); scanf("%d %d", &x, &y);
-		generate_array(x,y);
-		printf("enter location of kingdom:"); scanf("%d %d", &c.x, &c.y);
-		c.x--; c.y--; c.makeGold=1; c.makeFood=0; c.gold=5; c.food=0; c.worker=1; c.soldier=0; c.villcount=0;
-		map[c.x][c.y] = 7;
+  clrscr();
+  int x, y;
+  int n, i;
+  printf("enter x and y for map:"); scanf("%d %d", &x, &y);
+  generate_array(x,y);
+  printf("enter number of kingdoms:");
+  scanf("%d", &kingnum);
+  for(i=0; i<kingnum; i++){
+    printf("enter location of kingdom %d:", i+1); scanf("%d %d", &c[i].x, &c[i].y);
+    c[i].x--; c[i].y--; c[i].makeGold=1; c[i].makeFood=0; c[i].gold=5; c[i].food=0; c[i].worker=1;
+    c[i].soldier=0; c[i].villcount=0; map[c[i].x][c[i].y].forkingdom=i; map[c[i].x][c[i].y].type = KINGDOM;
+  } 
 
-		printf("enter number of villages:");
-		scanf("%d", &v);
-		for(i=0; i<v; i++) {
-			printf("enter location of village %d:", i+1);
-			scanf("%d %d", &Vill[i].x, &Vill[i].y);
-			Vill[i].x--; Vill[i].y--;
-			printf("enter food generation rate and gold generation rate for village %d:", i+1);
-			scanf("%d %d", &Vill[i].makeFood, &Vill[i].makeGold);
-			map[Vill[i].x][Vill[i].y] = 8;
-		}
+  int v;
+  village Vill[10];
+  while(true){
+    printf("enter number of villages:");
+    scanf("%d", &v);
+    if(v <= 10) break;
+    else printf("number of villages should be less than 10\n");
+  } 
+    for(i=0; i<v; i++) {
+      printf("enter location of village %d:", i+1);
+      scanf("%d %d", &Vill[i].x, &Vill[i].y);
+      Vill[i].x--; Vill[i].y--; map[Vill[i].x][Vill[i].y].forkingdom = -1;
+      printf("enter food generation rate and gold generation rate for village %d:", i+1);
+      scanf("%d %d", &Vill[i].makeFood, &Vill[i].makeGold);
+      map[Vill[i].x][Vill[i].y].type = VILLAGE;
+  }
 
-		printf("enter number of blocked houses:");
-		scanf("%d", &n);
-		for(i=0; i<n; i++) {
-			int pi, qi;
-			printf("enter location of blocked house %d:", i+1);
-			scanf("%d %d", &pi, &qi);
-			map[pi-1][qi-1] = -2;
-		}
+  printf("enter number of blocked houses:");
+  scanf("%d", &n);
+  for(i=0; i<n; i++) {
+    int pi, qi;
+    printf("enter location of blocked house %d:", i+1);
+    scanf("%d %d", &pi, &qi);
+    map[pi-1][qi-1].type = BLOCK_HOUSE;
+  }
+  
+  int screenWidth = x * TILE_SIZE;
+  int screenHeight = y * TILE_SIZE;
 
-		i = 0;
-		int villcount;
-		clrscr();printMap();printAsset(v);printMove();
-		sleep(1);
-		road.x = c.x; road.y = c.y;
+  InitWindow(screenWidth, screenHeight, "game");
+  SetWindowSize(GetMonitorWidth(0), GetMonitorHeight(0)); 
+  SetTargetFPS(60);
 
-		do{
-			int up = 1;
-			while(up){
-			up = update();
-			}
-			c.gold+=c.makeGold;
-			c.food+=c.makeFood;
-			for(i=0;i<v;i++){
-				if(conectionvillage(Vill[i])){
-					c.gold+=Vill[i].makeGold;
-					c.food+=Vill[i].makeFood;
-				}
-			}
-			villcount = 0;
-			for(i=0;i<v;i++){
-				if(conectionvillage(Vill[i])) villcount++;
-			}
-		}while(villcount < v);
-		clrscr(); printMap();
-		printf("YOU WIN!\n");
+  while (!WindowShouldClose()) {
+    bool skipPlayer = false; 
+    
+    for(int player = 0; player < kingnum; player++) {
+        int a = 0;
+        BeginDrawing(); 
+        ClearBackground(RAYWHITE);
+        
+        a = update(x, y, player); 
+        
+        if (!a) {
+            skipPlayer = true;
+        }
 
-		printf("press any key to exit\n");
-		scanf("%d", &i);
+        if (!skipPlayer) {
+            DrawMap(x, y, player);
+        }
+        
+        EndDrawing();
+        
+        if (skipPlayer) {
+            continue;
+        }
+    }
+}
 
-		return 0;
-	}
+CloseWindow();
+
+
+  return 0;
+}
