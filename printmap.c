@@ -2,13 +2,24 @@
 #include <stdlib.h>
 #include "printmap.h"
 #include "generateArray.h"
-#include "updategame.h"
 #include "raylib.h"
 
 extern Tile map[17][17];
 
 void clrscr(){
     system("clear");
+}
+
+Color checkColor(int player) {
+    Color color;
+    switch (player) {
+        case -1: color = GREEN; break;
+        case 0: color = BLUE; break;
+        case 1: color = RED; break;
+        case 2: color = ORANGE; break;
+        case 3: color = GOLD; break;
+    }
+    return color;
 }
 
 void DrawMap(int x, int y, int player) {
@@ -20,13 +31,7 @@ void DrawMap(int x, int y, int player) {
 
             switch (map[i][j].type) {      
                 case VILLAGE: {
-                    switch(map[i][j].forkingdom){
-                           case -1: color = GREEN; break;
-                            case 0: color = BLUE; break;
-                            case 1: color = RED; break;
-                            case 2: color = ORANGE; break;
-                            case 3: color = YELLOW; break;
-                        }
+                    color = checkColor(map[i][j].forkingdom);
                     DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color);
                     char valueText[10];
                     snprintf(valueText, 10, "V"); 
@@ -35,12 +40,7 @@ void DrawMap(int x, int y, int player) {
                         positionY + TILE_SIZE / 2 - 10, 20, BLACK); break;
                 }
                 case KINGDOM:{
-                switch(map[i][j].forkingdom){
-                        case 0: color = BLUE; break;
-                        case 1: color = RED; break;
-                        case 2: color = ORANGE; break;
-                        case 3: color = YELLOW; break;
-                    }
+                    color = checkColor(map[i][j].forkingdom);
                     DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color);
                     char valueText[10];
                     snprintf(valueText, 10, "C"); 
@@ -57,13 +57,9 @@ void DrawMap(int x, int y, int player) {
                     break;
                 case TERRAIN:color = BROWN; DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color);  break;
                 case ROAD:
-                    switch(map[i][j].forkingdom){
-                        case 0: color = BLUE; break;
-                        case 1: color = RED; break;
-                        case 2: color = ORANGE; break;
-                        case 3: color = YELLOW; break;
-                    }
+                    color = checkColor(map[i][j].forkingdom);
                     DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color); break;
+                default: break;
             }
             DrawRectangleLines(positionX, positionY, TILE_SIZE, TILE_SIZE, BLACK);
 
@@ -71,8 +67,8 @@ void DrawMap(int x, int y, int player) {
             char valueText[10]; 
             snprintf(valueText, 10, "%d", map[i][j].difficulty[player]); 
             DrawText(valueText, 
-                     positionX + TILE_SIZE / 2 - MeasureText(valueText, 20) / 2, 
-                     positionY + TILE_SIZE / 2 - 10, 20, BLACK);
+                    positionX + TILE_SIZE / 2 - MeasureText(valueText, 20) / 2, 
+                    positionY + TILE_SIZE / 2 - 10, 20, BLACK);
             }
         }
     }

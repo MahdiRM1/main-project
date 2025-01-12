@@ -1,4 +1,3 @@
-
 #ifndef GENERATEARRAY_H
 #define GENERATEARRAY_H
 

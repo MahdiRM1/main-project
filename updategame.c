@@ -11,26 +11,27 @@ extern village Vill[10];
 
 int buildRoadMode = 0; 
 
+Color ColorCheck(int player) {
+    Color color;
+    switch (player) {
+        case 0: color = BLUE; break;
+        case 1: color = RED; break;
+        case 2: color = ORANGE; break;
+        case 3: color = GOLD; break;
+    }
+    return color;
+}
+
 void DrawPlayerInfo(kingdom c[], int y, int x, int plturn) {
     Color color;
     char info[256];
     
-    switch (plturn) {
-            case 0: color = BLUE; break;
-            case 1: color = RED; break;
-            case 2: color = ORANGE; break;
-            case 3: color = YELLOW; break;
-        }
+    color = ColorCheck(plturn);
     sprintf(info, "turn player %d", plturn+1);
     DrawText(info, 400, x*TILE_SIZE+120, 25, color);
     
     for (int player = 0; player < kingnum; player++){
-        switch (player) {
-            case 0: color = BLUE; break;
-            case 1: color = RED; break;
-            case 2: color = ORANGE; break;
-            case 3: color = YELLOW; break;
-        }
+        color = ColorCheck(player);
     
         sprintf(info, "Gold: %d", c[player].gold);
         DrawText(info, y*TILE_SIZE+120, player*140 + 100, 25, color);
@@ -98,19 +99,21 @@ int update(int x, int y, int player) {
     int prevWorker = c[player].worker;
     int prevSoldier = c[player].soldier;
 
-    DrawRectangle(90, 15, 120, 30, YELLOW);
+    Color color;
+    color = ColorCheck(player);
+    DrawRectangle(90, 15, 120, 30, color);
     DrawRectangleLines(90, 15, 120, 30, BLACK);
     DrawText("buy food", 100, 20, 20, BLACK);
-    DrawRectangle(90, 65, 130, 30, YELLOW);
+    DrawRectangle(90, 65, 130, 30, color);
     DrawRectangleLines(90, 65, 130, 30, BLACK);
     DrawText("buy worker", 100, 70, 20, BLACK);
-    DrawRectangle(390, 15, 125, 30, YELLOW);
+    DrawRectangle(390, 15, 125, 30, color);
     DrawRectangleLines(390, 15, 125, 30, BLACK);
     DrawText("buy soldier", 400, 20, 20, BLACK);
-    DrawRectangle(390, 65, 120, 30, YELLOW);
+    DrawRectangle(390, 65, 120, 30, color);
     DrawRectangleLines(390, 65, 120, 30, BLACK);
     DrawText("build road", 400, 70, 20, BLACK);
-    DrawRectangle(240, 40, 120, 30, YELLOW);
+    DrawRectangle(240, 40, 120, 30, color);
     DrawRectangleLines(240, 40, 120, 30, BLACK);
     DrawText("do nothing", 250, 45, 20, BLACK);
     DrawPlayerInfo(c, y, x, player);
