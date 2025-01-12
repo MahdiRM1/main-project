@@ -1,8 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <termios.h>
-#include <unistd.h>
 #include "generateArray.h"
 #include "raylib.h"
 
@@ -23,7 +20,6 @@ int generate_number() {//randomize road difficulty
 }
 
 void generate_array(int x, int y) {
-    srand(time(NULL));
     int i, j;
     for (i = 0; i < 17; i++) 
         for (j = 0; j < 17; j++) {
@@ -41,5 +37,4 @@ void generate_array(int x, int y) {
             map[i][j].difficulty[2] = map[i][j].firstDiff;
             map[i][j].difficulty[3] = map[i][j].firstDiff;
         }
-
 }

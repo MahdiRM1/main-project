@@ -16,7 +16,8 @@ const int maxv=10;
 int main() {
   clrscr();
   int x, y;
-  int n, i;while(true){
+  int n, i;
+  while(true){
     printf("enter x and y for map:"); scanf("%d %d", &x, &y);
     if(x < MAP_SIZE && y < MAP_SIZE) break;
     else printf("x and y should be less than 17\n");
@@ -71,13 +72,11 @@ int main() {
     
     for(int player = 0; player <kingnum; player++) {
         int a = 0;
-        bool skipPlayer = false; 
         BeginDrawing(); 
         ClearBackground(RAYWHITE);
         
         a = update(x, y, player); 
         if (!a) {
-            skipPlayer = true;
             player--;
         }
         EndDrawing();
