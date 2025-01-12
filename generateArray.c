@@ -26,17 +26,20 @@ void generate_array(int x, int y) {
     srand(time(NULL));
     int i, j;
     for (i = 0; i < 17; i++) 
-        for (j = 0; j < 17; j++) 
+        for (j = 0; j < 17; j++) {
             if(i<x && j<y) {
                 map[i][j].firstDiff = generate_number();
-                map[i][j].difficulty[0] = map[i][j].firstDiff;
-                map[i][j].difficulty[1] = map[i][j].firstDiff;
-                map[i][j].difficulty[2] = map[i][j].firstDiff;
-                map[i][j].difficulty[3] = map[i][j].firstDiff;
                 map[i][j].type = TERRAIN;
             }
             else {
                 map[i][j].type = EMPTY;
                 map[i][j].firstDiff = INF;
             }
+            map[i][j].forkingdom = -1;
+            map[i][j].difficulty[0] = map[i][j].firstDiff;
+            map[i][j].difficulty[1] = map[i][j].firstDiff;
+            map[i][j].difficulty[2] = map[i][j].firstDiff;
+            map[i][j].difficulty[3] = map[i][j].firstDiff;
+        }
+
 }

@@ -19,20 +19,19 @@ typedef struct {
     int difficulty[4];
     int firstDiff;
     int forkingdom;
+    int villnum;
 } Tile;
 
 typedef struct{
     int x, y;
-    int makeFood, makeGold;
+    int FoodRate, GoldRate;
     int forkingdom;
 }village;
 
 typedef struct{
     int x, y;
-    int makeFood, makeGold;
+    int FoodRate, GoldRate;
     int gold, soldier, food, worker; 
-    village villgeconected[10]; 
-    int villcount;
 }kingdom;
 
 

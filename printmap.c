@@ -5,7 +5,6 @@
 #include "updategame.h"
 #include "raylib.h"
 
-extern kingdom c;
 extern Tile map[17][17];
 
 void clrscr(){
@@ -13,8 +12,6 @@ void clrscr(){
 }
 
 void DrawMap(int x, int y, int player) {
-    Texture2D imageV = LoadTexture("//media/mahdi/Other/village.png");
-    Texture2D imageB = LoadTexture("/media/mahdi/Other/block.png");
     for (int i = 0; i < x; i++) {
         for (int j = 0; j < y; j++) {
             int positionX = i * TILE_SIZE + 100;
@@ -46,12 +43,18 @@ void DrawMap(int x, int y, int player) {
                     }
                     DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color);
                     char valueText[10];
-                    snprintf(valueText, 10, "K"); 
+                    snprintf(valueText, 10, "C"); 
                     DrawText(valueText, 
                         positionX + TILE_SIZE / 2 - MeasureText(valueText, 20) / 2, 
                         positionY + TILE_SIZE / 2 - 10, 20, BLACK); break;
                 }
-                case BLOCK_HOUSE: DrawTexture(imageB, positionX, positionY, RED);  break;
+                case BLOCK_HOUSE: color = BLACK; DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color);
+                    char valueText[10];
+                    snprintf(valueText, 10, "X"); 
+                    DrawText(valueText, 
+                        positionX + TILE_SIZE / 2 - MeasureText(valueText, 20) / 2, 
+                        positionY + TILE_SIZE / 2 - 10, 20, WHITE); break;
+                    break;
                 case TERRAIN:color = BROWN; DrawRectangle(positionX, positionY, TILE_SIZE, TILE_SIZE, color);  break;
                 case ROAD:
                     switch(map[i][j].forkingdom){
