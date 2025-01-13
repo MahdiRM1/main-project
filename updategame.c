@@ -19,7 +19,7 @@ void DrawPlayerInfo(kingdom c[], int y, int x, int plturn) {
     
     color = checkColor(plturn);
     sprintf(info, "turn player %d", plturn+1);
-    DrawText(info, 400, x*TILE_SIZE+120, 25, color);
+    DrawText(info, 100 , x*TILE_SIZE+150, 30, color);
     
     for (int player = 0; player < kingnum; player++){
         color = checkColor(player);
@@ -46,10 +46,10 @@ void DrawPlayerInfo(kingdom c[], int y, int x, int plturn) {
 
 void conectionvillage(int gridX, int gridY, int player) { 
     int sw = 0;
-    if (map[gridX + 1][gridY].type == VILLAGE){ gridX++; sw = 1;}
-    else if (map[gridX][gridY + 1].type == VILLAGE){ gridY++; sw = 1;}
-    else if (map[gridX][gridY - 1].type == VILLAGE){ gridY--; sw = 1;}
-    else if (map[gridX - 1][gridY].type == VILLAGE){ gridX--; sw = 1;}
+    if (gridX < MAP_SIZE && map[gridX + 1][gridY].type == VILLAGE && map[gridX + 1][gridY].forkingdom != player){ gridX++; sw = 1;}
+    else if (gridY < MAP_SIZE && map[gridX][gridY + 1].type == VILLAGE  && map[gridX][gridY + 1].forkingdom != player){ gridY++; sw = 1;}
+    else if (gridY > 0 && map[gridX][gridY - 1].type == VILLAGE  && map[gridX][gridY - 1].forkingdom != player){ gridY--; sw = 1;}
+    else if (gridX > 0 && map[gridX - 1][gridY].type == VILLAGE  && map[gridX - 1][gridY].forkingdom != player){ gridX--; sw = 1;}
     if(sw && map[gridX][gridY].forkingdom != player){
         map[gridX][gridY].forkingdom = player;
         c[player].FoodRate += map[gridX][gridY].FoodRate;
@@ -57,11 +57,12 @@ void conectionvillage(int gridX, int gridY, int player) {
     }
 }
 
+
 int canBuild(int x, int y, int player) {    
-    if (map[x - 1][y].forkingdom == player  ||
-        map[x + 1][y].forkingdom == player  ||
-        map[x][y + 1].forkingdom == player  ||
-        map[x][y - 1].forkingdom == player) {
+    if ((x > 0 && map[x - 1][y].forkingdom == player)  ||
+        (x < MAP_SIZE && map[x + 1][y].forkingdom == player ) ||
+        (y < MAP_SIZE && map[x][y + 1].forkingdom == player ) ||
+        (y > 0 &&  map[x][y - 1].forkingdom == player) ){
         if (map[x][y].type == TERRAIN) return 1;
     }
     return 0;
@@ -175,7 +176,9 @@ int update(int player) {
                         map[gridX][gridY].type = ROAD;
                         map[gridX][gridY].forkingdom = player;
                         War(gridX, gridY, player);
-                        conectionvillage(gridX, gridY, player);
+                        if(map[gridX][gridY].forkingdom == player) conectionvillage(gridX, gridY, player);
+                        if(map[gridX][gridY].forkingdom == player) conectionvillage(gridX, gridY, player);
+                        if(map[gridX][gridY].forkingdom == player) conectionvillage(gridX, gridY, player);
                     } else {
                         map[gridX][gridY].difficulty[player] -= c[player].worker;
                     }

@@ -24,7 +24,8 @@ typedef struct {
 typedef struct{
     int x, y;
     int FoodRate, GoldRate;
-    int gold, soldier, food, worker; 
+    int gold, soldier, food, worker;
+    int isAlive;
 }kingdom;
 
 

@@ -6,6 +6,7 @@
 
 extern Tile map[17][17];
 extern int x, y;
+extern kingdom c[4];
 
 void clrscr(){
     system("clear");
@@ -14,12 +15,13 @@ void clrscr(){
 Color checkColor(int player) {
     Color color;
     switch (player) {
-        case -1: color = GREEN; break;
+        case -1: color = LIME; break;
         case 0: color = BLUE; break;
         case 1: color = RED; break;
-        case 2: color = ORANGE; break;
+        case 2: color = DARKPURPLE; break;
         case 3: color = GOLD; break;
     }
+    if(player > -1 && c[player].isAlive == 0) color = BLACK;
     return color;
 }
 

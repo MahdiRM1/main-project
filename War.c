@@ -9,13 +9,14 @@ extern kingdom c[4];
 extern int kingnum;
 extern Tile map[17][17];
 extern int x, y;
+extern int alivePlayers;
 
 int checkWar(int gridX, int gridY, int player, int *pl2) {
     int sw = 0;
-    if      (map[gridX + 1][gridY].forkingdom != player && map[gridX + 1][gridY].forkingdom != -1){ gridX++; sw = 1;}
-    else if (map[gridX][gridY + 1].forkingdom != player && map[gridX][gridY + 1].forkingdom != -1){ gridY++; sw = 1;}
-    else if (map[gridX][gridY - 1].forkingdom != player && map[gridX][gridY - 1].forkingdom != -1){ gridY--; sw = 1;}
-    else if (map[gridX - 1][gridY].forkingdom != player && map[gridX - 1][gridY].forkingdom != -1){ gridX--; sw = 1;}
+    if      (gridX < MAP_SIZE && map[gridX + 1][gridY].forkingdom != player && map[gridX + 1][gridY].forkingdom != -1){ gridX++; sw = 1;}
+    else if (gridY < MAP_SIZE && map[gridX][gridY + 1].forkingdom != player && map[gridX][gridY + 1].forkingdom != -1){ gridY++; sw = 1;}
+    else if (   gridY > 0     && map[gridX][gridY - 1].forkingdom != player && map[gridX][gridY - 1].forkingdom != -1){ gridY--; sw = 1;}
+    else if (   gridX > 0     && map[gridX - 1][gridY].forkingdom != player && map[gridX - 1][gridY].forkingdom != -1){ gridX--; sw = 1;}
     if(sw) *pl2 = map[gridX][gridY].forkingdom;
     if(sw && map[gridX][gridY].type==KINGDOM) return 2;
     return sw;
@@ -58,8 +59,10 @@ void mainWar(int player1, int player2){
 
 void All_outvoidWar(int attacker, int defender){
     if(c[defender].soldier<c[attacker].soldier){
-        map[c[defender].x][c[defender].y].type = TERRAIN;
-        map[c[defender].x][c[defender].y].forkingdom = -1;
+        DestroyLoser(defender);
+        map[c[defender].x][c[defender].y].type=BLOCK_HOUSE;
+        alivePlayers--;
+        c[defender].isAlive = 0;
     }
     else{
         DestroyLoser(attacker);
