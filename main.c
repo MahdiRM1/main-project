@@ -8,21 +8,20 @@
 kingdom c[4];
 Tile map[17][17]; //main array
 int v;
-village Vill[10];
 int kingnum;
+int x, y;
 
 const int maxv=10;
 
 int main() {
   clrscr();
-  int x, y;
   int n, i;
   while(true){
     printf("enter x and y for map:"); scanf("%d %d", &x, &y);
-    if(x < MAP_SIZE && y < MAP_SIZE) break;
+    if(x < MAP_SIZE && x>0 && y < MAP_SIZE && y>0) break;
     else printf("x and y should be less than 17\n");
   }
-  generate_array(x,y);
+  generate_array();
   while (true){
     printf("enter number of kingdoms:");
     scanf("%d", &kingnum);
@@ -32,7 +31,7 @@ int main() {
   for(i=0; i<kingnum; i++){
     printf("enter location of kingdom %d:", i+1); scanf("%d %d", &c[i].x, &c[i].y);
     c[i].x--; c[i].y--; c[i].GoldRate=1; c[i].FoodRate=0; c[i].gold=5; c[i].food=0; c[i].worker=1;
-    c[i].soldier=0; map[c[i].x][c[i].y].forkingdom=i; map[c[i].x][c[i].y].type = KINGDOM;
+    c[i].soldier=0; map[c[i].x][c[i].y].forkingdom = i; map[c[i].x][c[i].y].type = KINGDOM;
   } 
 
   int v;
@@ -43,12 +42,14 @@ int main() {
     else printf("number of villages should be less than 10\n");
   } 
     for(i=0; i<v; i++) {
+      int vx, vy;
+      int foodrate, goldrate;
       printf("enter location of village %d:", i+1);
-      scanf("%d %d", &Vill[i].x, &Vill[i].y);
-      Vill[i].x--; Vill[i].y--;
+      scanf("%d %d", &vx, &vy);
+      vx--; vy--;
       printf("enter food generation rate and gold generation rate for village %d:", i+1);
-      scanf("%d %d", &Vill[i].FoodRate, &Vill[i].GoldRate);
-      map[Vill[i].x][Vill[i].y].type = VILLAGE; map[Vill[i].x][Vill[i].y].villnum = i;
+      scanf("%d %d", &foodrate, &goldrate);
+      map[vx][vy].type = VILLAGE; map[vx][vy].FoodRate = foodrate; map[vx][vy].GoldRate = goldrate;
   }
 
   printf("enter number of blocked houses:");
@@ -75,7 +76,7 @@ int main() {
         BeginDrawing(); 
         ClearBackground(RAYWHITE);
         
-        a = update(x, y, player); 
+        a = update(player); 
         if (!a) {
             player--;
         }

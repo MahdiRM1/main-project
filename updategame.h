@@ -3,6 +3,6 @@
 
 #include "generateArray.h"
 
-int update(int x, int y, int player);
+int update(int player);
 
 #endif

@@ -5,6 +5,7 @@
 #include "raylib.h"
 
 extern Tile map[17][17];
+extern int x, y;
 
 void clrscr(){
     system("clear");
@@ -22,7 +23,7 @@ Color checkColor(int player) {
     return color;
 }
 
-void DrawMap(int x, int y, int player) {
+void DrawMap(int player) {
     for (int i = 0; i < x; i++) {
         for (int j = 0; j < y; j++) {
             int positionX = i * TILE_SIZE + 100;

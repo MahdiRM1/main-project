@@ -18,14 +18,8 @@ typedef struct {
     int difficulty[4];
     int firstDiff;
     int forkingdom;
-    int villnum;
-} Tile;
-
-typedef struct{
-    int x, y;
     int FoodRate, GoldRate;
-    int forkingdom;
-}village;
+} Tile;
 
 typedef struct{
     int x, y;
@@ -36,5 +30,5 @@ typedef struct{
 
 #define INF 1000000
 
-void generate_array(int x, int y);
+void generate_array();
 #endif 
