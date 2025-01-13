@@ -4,6 +4,7 @@
 #include "raylib.h"
 
 extern Tile map[17][17];
+extern int x, y;
 
 int generate_number() {//randomize road difficulty
     const double probs [9] = {0.65, 0.25, 0.05, 0.05, 0, 0, 0, 0, 0};
@@ -19,7 +20,7 @@ int generate_number() {//randomize road difficulty
     return -1;
 }
 
-void generate_array(int x, int y) {
+void generate_array() {
     int i, j;
     for (i = 0; i < 17; i++) 
         for (j = 0; j < 17; j++) {
@@ -36,5 +37,7 @@ void generate_array(int x, int y) {
             map[i][j].difficulty[1] = map[i][j].firstDiff;
             map[i][j].difficulty[2] = map[i][j].firstDiff;
             map[i][j].difficulty[3] = map[i][j].firstDiff;
+            map[i][j].GoldRate = 0;
+            map[i][j].FoodRate = 0;
         }
 }

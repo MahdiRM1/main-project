@@ -3,35 +3,26 @@
 #include "generateArray.h"
 #include "printmap.h"
 #include "raylib.h"
+#include "War.h"  
 
 extern kingdom c[4];
 extern int kingnum;
 extern Tile map[17][17];
-extern village Vill[10];
+extern int x, y;
 
 int buildRoadMode = 0; 
 
-Color ColorCheck(int player) {
-    Color color;
-    switch (player) {
-        case 0: color = BLUE; break;
-        case 1: color = RED; break;
-        case 2: color = ORANGE; break;
-        case 3: color = GOLD; break;
-    }
-    return color;
-}
 
 void DrawPlayerInfo(kingdom c[], int y, int x, int plturn) {
     Color color;
     char info[256];
     
-    color = ColorCheck(plturn);
+    color = checkColor(plturn);
     sprintf(info, "turn player %d", plturn+1);
     DrawText(info, 400, x*TILE_SIZE+120, 25, color);
     
     for (int player = 0; player < kingnum; player++){
-        color = ColorCheck(player);
+        color = checkColor(player);
     
         sprintf(info, "Gold: %d", c[player].gold);
         DrawText(info, y*TILE_SIZE+120, player*140 + 100, 25, color);
@@ -61,8 +52,8 @@ void conectionvillage(int gridX, int gridY, int player) {
     else if (map[gridX - 1][gridY].type == VILLAGE){ gridX--; sw = 1;}
     if(sw && map[gridX][gridY].forkingdom != player){
         map[gridX][gridY].forkingdom = player;
-        c[player].FoodRate += Vill[map[gridX][gridY].villnum].FoodRate;
-        c[player].GoldRate += Vill[map[gridX][gridY].villnum].GoldRate;
+        c[player].FoodRate += map[gridX][gridY].FoodRate;
+        c[player].GoldRate += map[gridX][gridY].GoldRate;
     }
 }
 
@@ -76,31 +67,31 @@ int canBuild(int x, int y, int player) {
     return 0;
 }
 
-void ShowTextFornSecond(double n, const char *text, int x, int y, int player, Color color) 
+void ShowTextFornSecond(double n, const char *text, int player, Color color) 
 {
     double startTime = GetTime();
     while(GetTime() - startTime < 0.2) {
         BeginDrawing();
-        DrawMap(x,y,player);
+        DrawMap(player);
         DrawText(text, 100, x*TILE_SIZE+120, 20, color);
         EndDrawing();
     }
     while (GetTime() - startTime < n && !IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         BeginDrawing();
-        DrawMap(x,y,player);
+        DrawMap(player);
         DrawText(text, 100, x*TILE_SIZE+120, 20, color);
         EndDrawing();
     }
 }
 
-int update(int x, int y, int player) {
+int update(int player) {
     int prevGold = c[player].gold;
     int prevFood = c[player].food;
     int prevWorker = c[player].worker;
     int prevSoldier = c[player].soldier;
 
     Color color;
-    color = ColorCheck(player);
+    color = checkColor(player);
     DrawRectangle(90, 15, 120, 30, color);
     DrawRectangleLines(90, 15, 120, 30, BLACK);
     DrawText("buy food", 100, 20, 20, BLACK);
@@ -117,7 +108,7 @@ int update(int x, int y, int player) {
     DrawRectangleLines(240, 40, 120, 30, BLACK);
     DrawText("do nothing", 250, 45, 20, BLACK);
     DrawPlayerInfo(c, y, x, player);
-    DrawMap(x, y, player);
+    DrawMap(player);
 
     int a = 0;
     int mouseX = GetMouseX();
@@ -126,24 +117,24 @@ int update(int x, int y, int player) {
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         if (mouseX >= 90 && mouseX <= 210 && mouseY >= 15 && mouseY <= 45) {
             if (c[player].gold > 0) {
-                ShowTextFornSecond(1, "succesfully!", x, y, player, RED);
+                ShowTextFornSecond(1, "succesfully!",player, RED);
                 c[player].gold--;
                 c[player].food++;
                 a = 1;
             } else {
-                ShowTextFornSecond(1, "Not enough gold!", x, y, player, RED);
+                ShowTextFornSecond(1, "Not enough gold!",player, RED);
                 c[player].gold = prevGold;
                 c[player].food = prevFood;
             }
         }
         else if (mouseX >= 90 && mouseX <= 210 && mouseY >= 65 && mouseY <= 95) {
             if (c[player].food > 2) {
-                ShowTextFornSecond(1, "succesfully!", x, y, player, RED);
+                ShowTextFornSecond(1, "succesfully!",player, RED);
                 c[player].food -= 3;
                 c[player].worker++;
                 a = 1;
             } else {
-                ShowTextFornSecond(1, "Not enough food!", x, y, player, RED);
+                ShowTextFornSecond(1, "Not enough food!",player, RED);
                 c[player].gold = prevGold;
                 c[player].food = prevFood;
                 c[player].worker = prevWorker;
@@ -151,12 +142,12 @@ int update(int x, int y, int player) {
         }
         else if (mouseX >= 390 && mouseX <= 510 && mouseY >= 15 && mouseY <= 45) {
             if (c[player].gold > 1) {
-                ShowTextFornSecond(1, "succesfully!", x, y, player, RED);
+                ShowTextFornSecond(1, "succesfully!",player, RED);
                 c[player].gold -= 2;
                 c[player].soldier++;
                 a = 1;
             } else {
-                ShowTextFornSecond(1, "Not enough gold!", x, y, player, RED);
+                ShowTextFornSecond(1, "Not enough gold!",player, RED);
                 c[player].gold = prevGold;
                 c[player].food = prevFood;
                 c[player].soldier = prevSoldier;
@@ -165,11 +156,11 @@ int update(int x, int y, int player) {
     
         else if (mouseX >= 390 && mouseX <= 510 && mouseY >= 65 && mouseY <= 95) {
             buildRoadMode = 1; 
-            ShowTextFornSecond(20, "click to build road", x, y, player, RED);
+            ShowTextFornSecond(20, "click to build road",player, RED);
         }
         
         else if (mouseX >= 240 && mouseX <= 360 && mouseY >= 40 && mouseY <= 70){
-            ShowTextFornSecond(1, "succesfully!", x, y, player, RED);
+            ShowTextFornSecond(1, "succesfully!",player, RED);
             a = 1;
         }
 
@@ -183,6 +174,7 @@ int update(int x, int y, int player) {
                     if (map[gridX][gridY].difficulty[player] <= c[player].worker) {
                         map[gridX][gridY].type = ROAD;
                         map[gridX][gridY].forkingdom = player;
+                        War(gridX, gridY, player);
                         conectionvillage(gridX, gridY, player);
                     } else {
                         map[gridX][gridY].difficulty[player] -= c[player].worker;
@@ -191,7 +183,7 @@ int update(int x, int y, int player) {
                     a = 1;
                 }
                 else {
-                    ShowTextFornSecond(1, "Cant build road here!", x, y, player, RED);
+                    ShowTextFornSecond(1, "Cant build road here!",player, RED);
                 }
             }
         }
