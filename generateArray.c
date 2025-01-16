@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "generateArray.h"
 #include "raylib.h"
 
@@ -22,6 +23,7 @@ int generate_number() {//randomize road difficulty
 
 void generate_array() {
     int i, j;
+    srand(time(NULL));
     for (i = 0; i < 17; i++) 
         for (j = 0; j < 17; j++) {
             if(i<x && j<y) {

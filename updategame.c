@@ -10,6 +10,9 @@ extern int kingnum;
 extern Tile map[17][17];
 extern int x, y;
 
+int dx[4] = {1, 0, -1, 0};
+int dy[4] = {0, 1, 0, -1};
+
 int buildRoadMode = 0; 
 
 
@@ -45,42 +48,45 @@ void DrawPlayerInfo(kingdom c[], int y, int x, int plturn) {
 }
 
 void conectionvillage(int gridX, int gridY, int player) { 
-    int sw = 0;
-    if (gridX < MAP_SIZE && map[gridX + 1][gridY].type == VILLAGE && map[gridX + 1][gridY].forkingdom != player){ gridX++; sw = 1;}
-    else if (gridY < MAP_SIZE && map[gridX][gridY + 1].type == VILLAGE  && map[gridX][gridY + 1].forkingdom != player){ gridY++; sw = 1;}
-    else if (gridY > 0 && map[gridX][gridY - 1].type == VILLAGE  && map[gridX][gridY - 1].forkingdom != player){ gridY--; sw = 1;}
-    else if (gridX > 0 && map[gridX - 1][gridY].type == VILLAGE  && map[gridX - 1][gridY].forkingdom != player){ gridX--; sw = 1;}
-    if(sw && map[gridX][gridY].forkingdom != player){
-        map[gridX][gridY].forkingdom = player;
-        c[player].FoodRate += map[gridX][gridY].FoodRate;
-        c[player].GoldRate += map[gridX][gridY].GoldRate;
+    for (int i = 0; i < 4; i++) {
+        int sw = 0;
+        int nx = gridX + dx[i];
+        int ny = gridY + dy[i];
+
+        if(nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE &&
+        map[nx][ny].type == VILLAGE && map[nx][ny].forkingdom != player) sw = 1;
+        if(sw && map[nx][ny].forkingdom != player){
+            map[nx][ny].forkingdom = player;
+            c[player].FoodRate += map[nx][ny].FoodRate;
+            c[player].GoldRate += map[nx][ny].GoldRate;
+        }
     }
 }
 
 
 int canBuild(int x, int y, int player) {    
-    if ((x > 0 && map[x - 1][y].forkingdom == player)  ||
-        (x < MAP_SIZE && map[x + 1][y].forkingdom == player ) ||
-        (y < MAP_SIZE && map[x][y + 1].forkingdom == player ) ||
-        (y > 0 &&  map[x][y - 1].forkingdom == player) ){
-        if (map[x][y].type == TERRAIN) return 1;
+    int sw = 0;
+    for (int i = 0; i < 4; i++) {
+        int nx = x + dx[i];
+        int ny = y + dy[i];
+    if (map[nx][ny].forkingdom == player) sw = 1;
     }
+    if (sw && map[x][y].type == TERRAIN) return 1;
     return 0;
 }
 
-void ShowTextFornSecond(double n, const char *text, int player, Color color) 
-{
+void ShowTextFornSecond(double n, const char *text, int player, int ax, int ay, int size, Color color) {
     double startTime = GetTime();
     while(GetTime() - startTime < 0.2) {
         BeginDrawing();
         DrawMap(player);
-        DrawText(text, 100, x*TILE_SIZE+120, 20, color);
+        DrawText(text, ax, ay, size, color);
         EndDrawing();
     }
     while (GetTime() - startTime < n && !IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         BeginDrawing();
         DrawMap(player);
-        DrawText(text, 100, x*TILE_SIZE+120, 20, color);
+        DrawText(text, ax, ay, size, color);
         EndDrawing();
     }
 }
@@ -118,24 +124,24 @@ int update(int player) {
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         if (mouseX >= 90 && mouseX <= 210 && mouseY >= 15 && mouseY <= 45) {
             if (c[player].gold > 0) {
-                ShowTextFornSecond(1, "succesfully!",player, RED);
+                ShowTextFornSecond(1, "succesfully!",player, 100, x*TILE_SIZE+120, 20, RED);
                 c[player].gold--;
                 c[player].food++;
                 a = 1;
             } else {
-                ShowTextFornSecond(1, "Not enough gold!",player, RED);
+                ShowTextFornSecond(1, "Not enough gold!", player, 100, x*TILE_SIZE+120, 20, RED);
                 c[player].gold = prevGold;
                 c[player].food = prevFood;
             }
         }
         else if (mouseX >= 90 && mouseX <= 210 && mouseY >= 65 && mouseY <= 95) {
             if (c[player].food > 2) {
-                ShowTextFornSecond(1, "succesfully!",player, RED);
+                ShowTextFornSecond(1, "succesfully!", player, 100, x*TILE_SIZE+120, 20, RED);
                 c[player].food -= 3;
                 c[player].worker++;
                 a = 1;
             } else {
-                ShowTextFornSecond(1, "Not enough food!",player, RED);
+                ShowTextFornSecond(1, "Not enough food!", player, 100, x*TILE_SIZE+120, 20, RED);
                 c[player].gold = prevGold;
                 c[player].food = prevFood;
                 c[player].worker = prevWorker;
@@ -143,12 +149,12 @@ int update(int player) {
         }
         else if (mouseX >= 390 && mouseX <= 510 && mouseY >= 15 && mouseY <= 45) {
             if (c[player].gold > 1) {
-                ShowTextFornSecond(1, "succesfully!",player, RED);
+                ShowTextFornSecond(1, "succesfully!", player, 100, x*TILE_SIZE+120, 20, RED);
                 c[player].gold -= 2;
                 c[player].soldier++;
                 a = 1;
             } else {
-                ShowTextFornSecond(1, "Not enough gold!",player, RED);
+                ShowTextFornSecond(1, "Not enough gold!", player, 100, x*TILE_SIZE+120, 20, RED);
                 c[player].gold = prevGold;
                 c[player].food = prevFood;
                 c[player].soldier = prevSoldier;
@@ -157,11 +163,11 @@ int update(int player) {
     
         else if (mouseX >= 390 && mouseX <= 510 && mouseY >= 65 && mouseY <= 95) {
             buildRoadMode = 1; 
-            ShowTextFornSecond(20, "click to build road",player, RED);
+            ShowTextFornSecond(20, "click to build road", player, 100, x*TILE_SIZE+120, 20, RED);
         }
         
         else if (mouseX >= 240 && mouseX <= 360 && mouseY >= 40 && mouseY <= 70){
-            ShowTextFornSecond(1, "succesfully!",player, RED);
+            ShowTextFornSecond(1, "succesfully!", player, 100, x*TILE_SIZE+120, 20, RED);
             a = 1;
         }
 
@@ -186,7 +192,7 @@ int update(int player) {
                     a = 1;
                 }
                 else {
-                    ShowTextFornSecond(1, "Cant build road here!",player, RED);
+                    ShowTextFornSecond(1, "Cant build road here!", player, 100, x*TILE_SIZE+120, 20, RED);
                 }
             }
         }
