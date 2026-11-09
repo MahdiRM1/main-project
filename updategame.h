@@ -1,10 +1,8 @@
 #ifndef UPDATEGAME_H
 #define UPDATEGAME_H
 
-#include "raylib.h"
-
-void sleep(double n, int player);
-void ShowTextFornSecond(double n, const char *text, int player, int ax, int ay, int size, Color color) ;
+int canBuild(int gridX, int gridY, int player);
+void conectionvillage(int gridX, int gridY, int player);
 int update(int player);
 
 #endif

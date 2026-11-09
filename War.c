@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include "updategame.h"
-#include "generateArray.h"
+#include "generateMap.h"
 #include "War.h"
+#include "printmap.h"
+#include "info.h"
 
 extern kingdom c[4];
 extern Tile map[17][17];
@@ -19,8 +21,8 @@ int checkWar(fighter fighters[]) {
             int sw = 1;
             for(int j = 1; j < counter; j++){
                 if(fighters[j].player == map[nx][ny].forkingdom){
-                    sw = 0;
                     if(map[nx][ny].type == KINGDOM){
+                        sw = 0;
                         fighters[j].x = nx;
                         fighters[j].y = ny;
                         fighters[j].player = map[nx][ny].forkingdom;
@@ -40,7 +42,9 @@ int checkWar(fighter fighters[]) {
 
 
 void Destroy(int nx, int ny){
+    extern Sound bubble;
     int player = map[nx][ny].forkingdom;
+    PlaySound(bubble);
     sleep(0.1, player);
     if(map[nx][ny].type == ROAD)map[nx][ny].type = TERRAIN;
     else if(map[nx][ny].type == VILLAGE){
@@ -97,23 +101,24 @@ void highDestroy(int gridX, int gridY){
 }
 
 
-int checkKingdom(int checkX, int checkY, int Previous) {
+int checkKingdom(int checkX, int checkY, int isCheck[][17]) {
     int player = map[checkX][checkY].forkingdom;
 
     for (int i = 0; i < 4; i++) {
         int nx = checkX + dx[i];
         int ny = checkY + dy[i];
         int count = 0;
-        if((dx[Previous]+dx[i])==0 && (dy[Previous]+dy[i])==0) continue;
-
         if (nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE &&
-            map[nx][ny].forkingdom == player) {
-            count++;
+            map[nx][ny].forkingdom == player && !isCheck[nx][ny]) {
+                count++;
+                isCheck[nx][ny] = 1;
 
             if (map[nx][ny].type == KINGDOM) return 1;
             else if(!count) return 0;
             
-            if (checkKingdom(nx, ny, i)) return 1;
+            if (checkKingdom(nx, ny, isCheck)){
+                return 1;
+            }
         }
     }
 
@@ -123,11 +128,14 @@ int checkKingdom(int checkX, int checkY, int Previous) {
 
 void DestroyLoser(fighter loser){
     Destroy(loser.x, loser.y);
+
     for (int i = 0; i < 4; i++) {
         int nx = loser.x + dx[i];
         int ny = loser.y + dy[i];
-        if (nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE && map[nx][ny].forkingdom == loser.player) {
-            if(checkKingdom(nx, ny, i)) {
+        if (nx >= 0 && nx < MAP_SIZE && ny >= 0 && ny < MAP_SIZE && map[nx][ny].forkingdom == loser.player && map[nx][ny].type != KINGDOM) {
+            int isCheck[17][17] = {0};
+            int checkking = checkKingdom(nx, ny, isCheck);
+            if(checkking) {
                 if(map[loser.x][loser.y].type == VILLAGE){
                     loser.x = nx;
                     loser.y = ny;
@@ -159,115 +167,91 @@ void DestroyAll(int player){
 void mainWar(fighter fighter1, fighter fighter2){
 
     if(c[fighter1.player].soldier>c[fighter2.player].soldier){
-        ShowTextFornSecond(0.5, "War!", fighter2.player, x/2*TILE_SIZE + 100, y/2*TILE_SIZE + 100, 100, BLACK);
         DestroyLoser(fighter2);
         c[fighter1.player].soldier -= c[fighter2.player].soldier;
         c[fighter2.player].soldier = 0;
+        c[fighter2.player].price_soldier = 1;
     }
     else if(c[fighter1.player].soldier<c[fighter2.player].soldier){
-        ShowTextFornSecond(0.5, "War!", fighter1.player, x/2*TILE_SIZE + 100, y/2*TILE_SIZE + 100, 100, BLACK);
         DestroyLoser(fighter1);
         c[fighter2.player].soldier -= c[fighter1.player].soldier;
         c[fighter1.player].soldier = 0;
+        c[fighter1.player].price_soldier = 1;
     }
     else{
-        ShowTextFornSecond(0.5, "War!", fighter1.player, x/2*TILE_SIZE + 100, y/2*TILE_SIZE + 100, 100, BLACK);
         DestroyLoser(fighter1);
         DestroyLoser(fighter2);
         c[fighter1.player].soldier = 0;
+        c[fighter1.player].price_soldier = 1;
         c[fighter2.player].soldier = 0;
+        c[fighter2.player].price_soldier = 1;
     }
 }
 
 
-void All_outvoidWar(fighter attacker, int defender){
-    if(c[defender].soldier<c[attacker.player].soldier){
-        ShowTextFornSecond(0.5, "Big War!", attacker.player, x/2*TILE_SIZE + 100, y/2*TILE_SIZE + 100, 100, BLACK);
+void AllOutWar(fighter attacker, int defender) {
+
+    extern Sound lose; 
+
+    if (c[defender].soldier < c[attacker.player].soldier) {
+        PlaySound(lose);
+
+        char info[100];
+        sprintf(info, "Player %d loooooose", defender + 1);
+        Color color = checkColor(defender);
+        ShowTextFornSecond(1, info, defender, 50, 50, 50, color);
+
         DestroyAll(defender);
-    }
-    else{
-        ShowTextFornSecond(0.5, "War!", attacker.player, x/2*TILE_SIZE + 100, y/2*TILE_SIZE + 100, 100, BLACK);
+    } else {
+
         DestroyLoser(attacker);
         c[defender].soldier -= c[attacker.player].soldier;
         c[attacker.player].soldier = 0;
+        c[attacker.player].price_soldier = 1;
     }
 }
 
 
-void TreeManWar(fighter fighters[]){
 
-    //At least one all out void war
-    if(map[fighters[1].x][fighters[1].y].type == KINGDOM){
-        All_outvoidWar(fighters[0], fighters[1].player);
-        if(map[fighters[0].x][fighters[0].y].forkingdom == fighters[0].player) {
-            if(map[fighters[2].x][fighters[2].y].type == KINGDOM) All_outvoidWar(fighters[0], fighters[2].player);
-            else mainWar(fighters[0], fighters[2]);
-        }
-        return;
-    }
-    
-    else if(map[fighters[2].x][fighters[2].y].type == KINGDOM){
-        All_outvoidWar(fighters[0], fighters[2].player);
+void nFightersWar(fighter fighters[], int n){   
+    extern Sound fight;
+    if(n == 1) return;
+    PlaySound(fight);
+    ShowTextFornSecond(0.5, "War!", fighters[0].player, x/2*TILE_SIZE + 100, y/2*TILE_SIZE + 100, 100, WHITE);
+    for(int i = 1; i < n; i++)
         if(map[fighters[0].x][fighters[0].y].forkingdom == fighters[0].player){
-            if(map[fighters[1].x][fighters[1].y].type == KINGDOM) All_outvoidWar(fighters[0], fighters[1].player);
-            else mainWar(fighters[0], fighters[1]);
-        }
-        return;
+            if(map[fighters[i].x][fighters[i].y].type == KINGDOM){
+                AllOutWar(fighters[0], fighters[i].player);
+            }
+            else if(map[fighters[i].x][fighters[i].y].forkingdom == fighters[i].player) mainWar(fighters[0], fighters[i]);
     }
+}
 
-    //two main wars
-    if(c[fighters[1].player].soldier < c[fighters[2].player].soldier){
-        mainWar(fighters[0], fighters[1]);
-        if(map[fighters[0].x][fighters[0].y].forkingdom == fighters[0].player) mainWar(fighters[0], fighters[2]);
-        return;
-    }
-    else if(c[fighters[1].player].soldier > c[fighters[2].player].soldier){
-        mainWar(fighters[0], fighters[2]);
-        if(map[fighters[0].x][fighters[0].y].forkingdom == fighters[0].player) mainWar(fighters[0], fighters[1]);
-        return;
-    }
-    else {
-        if(c[fighters[0].player].soldier > c[fighters[1].player].soldier + c[fighters[2].player].soldier){
-            DestroyLoser(fighters[1]);
-            DestroyLoser(fighters[2]);
-            c[fighters[0].player].soldier -= (c[fighters[1].player].soldier + c[fighters[1].player].soldier);
-            c[fighters[1].player].soldier = 0;
-            c[fighters[2].player].soldier = 0;
-            return;
-        }
-        else if(c[fighters[0].player].soldier < c[fighters[1].player].soldier + c[fighters[2].player].soldier){
-            DestroyLoser(fighters[0]);
-            c[fighters[1].player].soldier -= (c[fighters[0].player].soldier / 2);
-            c[fighters[2].player].soldier -= (c[fighters[0].player].soldier / 2);
-            c[fighters[0].player].soldier = 0;
-            return;
-        }
-        else {
-            DestroyLoser(fighters[0]);
-            DestroyLoser(fighters[1]);
-            DestroyLoser(fighters[2]);
-            c[fighters[0].player].soldier = 0;
-            c[fighters[1].player].soldier = 0;
-            c[fighters[2].player].soldier = 0;
-            return;
-        }
-    }
+
+void swapFighters(fighter fighters[], int i, int j){
+    fighter tmp;
+    tmp = fighters[i];
+    fighters[i] = fighters[j];
+    fighters[j] = tmp;
+}
+
+
+void sortFighters(fighter fighters[], int n){
+    int countnokingdom = 0;
+    for(int i = 1; i < n; i++) if(map[fighters[i].x][fighters[i].y].type != KINGDOM) swapFighters(fighters, i, ++countnokingdom);
+    for(int i = 1; i <= countnokingdom; i++)
+        for(int j = i + 1; j <= countnokingdom; j++)
+            if(c[fighters[i].player].soldier > c[fighters[j].player].soldier) swapFighters(fighters, i, j);
+    
+    for(int i = countnokingdom + 1; i < n; i++)
+        for(int j = i + 1; j < n; j++)
+            if(c[fighters[i].player].soldier > c[fighters[j].player].soldier) swapFighters(fighters, i, j);
 }
 
 
 void War(int gridX, int gridY, int player){
     fighter fighters[4] = {{gridX, gridY, player}, {-1, -1, -1}, {-1, -1, -1}, {-1, -1, -1}};
     int Warmode = checkWar(fighters);
-    switch (Warmode){
-        case 1: break;
-        case 2:{
-            if(map[fighters[1].x][fighters[1].y].type == KINGDOM) All_outvoidWar(fighters[0], fighters[1].player);
-            else mainWar(fighters[0], fighters[1]);
-            break;
-        }
-        case 3:{
-            TreeManWar(fighters);
-            break;
-        }
-    }
+    sortFighters(fighters, Warmode);
+    nFightersWar(fighters, Warmode);
 }
