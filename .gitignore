@@ -1,0 +1,114 @@
+# ===== CMake Build Directories =====
+build/
+cmake-build-*/
+out/
+Debug/
+Release/
+RelWithDebInfo/
+MinSizeRel/
+*.cmake.stamp
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+install_manifest.txt
+compile_commands.json
+*.dir/
+_deps/
+
+# ===== CMake Generated Files =====
+CMakeUserPresets.json
+*.cbp
+*.sln
+*.vcxproj*
+*.xcodeproj/
+
+# ===== Compiled Object Files & Executables =====
+*.o
+*.obj
+*.lo
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+*.bin
+*.elf
+*.hex
+*.map
+*.ko
+*.mod
+*.mod.c
+*.symvers
+*.order
+*.pdb
+*.ilk
+*.exp
+
+# ===== Dependency Files =====
+*.d
+*.dSYM/
+
+# ===== Precompiled Headers =====
+*.gch
+*.pch
+
+# ===== Test & Coverage =====
+Testing/
+*.gcda
+*.gcno
+*.gcov
+coverage/
+*.lcov
+*.profraw
+*.profdata
+
+# ===== Packages & Archives =====
+*.deb
+*.rpm
+*.tar.gz
+*.tar.bz2
+*.zip
+*.7z
+
+# ===== Logs & Temporary Files =====
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ===== IDE / Editor =====
+.vscode/
+.idea/
+*.kdev4
+*.user
+*.user.*
+*.suo
+*.autosave
+.cproject
+.project
+.settings/
+*.code-workspace
+
+# ===== Environment & Secrets =====
+.env
+.env.*
+*.pem
+*.key
+
+# ===== Misc =====
+*.orig
+*.rej
+.vagrant/
+</｜｜DSML｜｜ parameter>
+</｜｜DSML｜｜ invoke>
+</｜｜DSML｜｜ calls>
